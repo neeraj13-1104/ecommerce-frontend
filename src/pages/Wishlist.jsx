@@ -37,7 +37,7 @@ const Wishlist = () => {
           },
         }
       );
-      fetchWishlist(); // refresh
+      fetchWishlist();
     } catch (err) {
       console.error(err);
     }
@@ -56,7 +56,6 @@ const Wishlist = () => {
         }
       );
 
-      // remove from wishlist after adding to cart
       await removeFromWishlist(productId);
     } catch (err) {
       console.error(err);
@@ -68,20 +67,26 @@ const Wishlist = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">My Wishlist ❤️</h1>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6 text-center sm:text-left">
+        My Wishlist ❤️
+      </h1>
 
-      {loading && <p>Loading wishlist...</p>}
-
-      {!loading && items.length === 0 && (
-        <p className="text-gray-500">No items in wishlist</p>
+      {loading && (
+        <p className="text-center text-gray-500">Loading wishlist...</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      {!loading && items.length === 0 && (
+        <p className="text-center text-gray-500">
+          No items in wishlist
+        </p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {items.map((item) => (
           <div
             key={item._id}
-            className="bg-white p-4 rounded shadow hover:shadow-lg transition"
+            className="bg-white p-4 rounded shadow hover:shadow-lg transition flex flex-col"
           >
             <img
               src={
@@ -92,7 +97,7 @@ const Wishlist = () => {
               className="h-40 w-full object-cover rounded"
             />
 
-            <h2 className="mt-2 font-semibold truncate">
+            <h2 className="mt-3 font-semibold truncate">
               {item.title}
             </h2>
 
@@ -101,17 +106,17 @@ const Wishlist = () => {
             </p>
 
             {/* ACTIONS */}
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-4 mt-auto">
               <button
                 onClick={() => moveToCart(item._id)}
-                className="flex-1 bg-purple-600 text-white py-2 rounded flex items-center justify-center gap-2 hover:bg-purple-700"
+                className="flex-1 bg-purple-600 text-white py-2 rounded flex items-center justify-center gap-2 hover:bg-purple-700 text-sm sm:text-base"
               >
                 <FaShoppingCart /> Cart
               </button>
 
               <button
                 onClick={() => removeFromWishlist(item._id)}
-                className="bg-red-500 text-white px-3 rounded hover:bg-red-600"
+                className="bg-red-500 text-white px-3 rounded hover:bg-red-600 flex items-center justify-center"
               >
                 <FaTrash />
               </button>

@@ -13,18 +13,20 @@ import {
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-gray-300 mt-16">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-center sm:text-left">
 
         {/* 🔹 BRAND */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">MyStore</h2>
-          <p className="text-sm leading-relaxed text-gray-400">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            MyStore
+          </h2>
+          <p className="text-sm leading-relaxed text-gray-400 max-w-sm mx-auto sm:mx-0">
             India’s trusted online shopping platform for quality products,
             fast delivery and secure payments.
           </p>
 
           {/* SOCIAL ICONS */}
-          <div className="flex gap-4 mt-5">
+          <div className="flex gap-4 mt-5 justify-center sm:justify-start">
             <IconWrap><FaFacebookF /></IconWrap>
             <IconWrap><FaInstagram /></IconWrap>
             <IconWrap><FaTwitter /></IconWrap>
@@ -51,7 +53,7 @@ const Footer = () => {
           <h3 className="text-white font-semibold mb-4 tracking-wide">
             Categories
           </h3>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-sm text-gray-400">
             <li>Smartphones</li>
             <li>Laptops</li>
             <li>Fashion</li>
@@ -66,15 +68,15 @@ const Footer = () => {
             Contact Us
           </h3>
           <ul className="space-y-3 text-sm text-gray-400">
-            <li className="flex items-center gap-2">
+            <li className="flex items-center justify-center sm:justify-start gap-2">
               <FaMapMarkerAlt className="text-purple-500" />
               India
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center justify-center sm:justify-start gap-2">
               <FaPhoneAlt className="text-purple-500" />
               +91 98765 43210
             </li>
-            <li className="flex items-center gap-2">
+            <li className="flex items-center justify-center sm:justify-start gap-2">
               <FaEnvelope className="text-purple-500" />
               support@mystore.com
             </li>
@@ -83,14 +85,14 @@ const Footer = () => {
       </div>
 
       {/* 🔻 BOTTOM BAR */}
-      <div className="border-t border-gray-800 text-center py-4 text-sm text-gray-500">
+      <div className="border-t border-gray-800 text-center py-4 text-sm text-gray-500 px-4">
         © {new Date().getFullYear()} MyStore. All rights reserved.
       </div>
     </footer>
   );
 };
 
-/* 🔹 Small reusable components */
+/* 🔹 Reusable components */
 
 const FooterLink = ({ to, children }) => (
   <li>

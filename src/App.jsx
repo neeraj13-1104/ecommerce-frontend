@@ -12,24 +12,20 @@ import Offers from "./pages/Offers";
 import Orders from "./pages/Order";
 import Footer from "./pages/Footer";
 import CategoryBar from "./components/CategoryBar";
-
 import Header from "./components/Header";
 import HomeCarousel from "./components/HomeCarousel";
 import React from "react";
+import OfferProducts from "./pages/OfferProducts";
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [selectedCategory, setSelectedCategory] = useState("all");
-
-  // 🔴 CHANGED: cart sidebar state
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleLogout = () => {
     setToken(null);
     localStorage.removeItem("token");
   };
 
-  // 🔐 Protected Route
   const ProtectedRoute = ({ children }) => {
     if (!token) return <Navigate to="/auth" />;
     return children;
@@ -60,17 +56,11 @@ const App = () => {
           element={
             <ProtectedRoute>
               <>
-                {/* 🔴 CHANGED */}
-                <Header
-                  onLogout={handleLogout}
-                  onCartOpen={() => setIsCartOpen(true)}
-                />
-
+                <Header onLogout={handleLogout} />
                 <CategoryBar
                   selectedCategory={selectedCategory}
                   onSelectCategory={setSelectedCategory}
                 />
-
                 <HomeCarousel selectedCategory={selectedCategory} />
                 <Products selectedCategory={selectedCategory} />
                 <Footer />
@@ -85,12 +75,23 @@ const App = () => {
           element={
             <ProtectedRoute>
               <>
-                {/* 🔴 CHANGED */}
-                <Header
-                  onLogout={handleLogout}
-                  onCartOpen={() => setIsCartOpen(true)}
-                />
+                <Header onLogout={handleLogout} />
                 <ProductPage />
+                <Footer />
+              </>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ✅ CART PAGE (YAHI FIX HAI) */}
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <>
+                <Header onLogout={handleLogout} />
+                <Cart />
+                <Footer />
               </>
             </ProtectedRoute>
           }
@@ -102,11 +103,7 @@ const App = () => {
           element={
             <ProtectedRoute>
               <>
-                {/* 🔴 CHANGED */}
-                <Header
-                  onLogout={handleLogout}
-                  onCartOpen={() => setIsCartOpen(true)}
-                />
+                <Header onLogout={handleLogout} />
                 <Orders />
                 <Footer />
               </>
@@ -114,20 +111,15 @@ const App = () => {
           }
         />
 
-        {/* ❌ CART ROUTE REMOVED (Option-2) */}
-
         {/* WISHLIST */}
         <Route
           path="/wishlist"
           element={
             <ProtectedRoute>
               <>
-                {/* 🔴 CHANGED */}
-                <Header
-                  onLogout={handleLogout}
-                  onCartOpen={() => setIsCartOpen(true)}
-                />
+                <Header onLogout={handleLogout} />
                 <Wishlist />
+                <Footer />
               </>
             </ProtectedRoute>
           }
@@ -139,12 +131,9 @@ const App = () => {
           element={
             <ProtectedRoute>
               <>
-                {/* 🔴 CHANGED */}
-                <Header
-                  onLogout={handleLogout}
-                  onCartOpen={() => setIsCartOpen(true)}
-                />
+                <Header onLogout={handleLogout} />
                 <Offers />
+                <Footer />
               </>
             </ProtectedRoute>
           }
@@ -155,13 +144,21 @@ const App = () => {
           path="*"
           element={<Navigate to={token ? "/products" : "/auth"} />}
         />
-      </Routes>
+        <Route
+  path="/offer/:offerId"
+  element={
+    <ProtectedRoute>
+      <>
+        <Header onLogout={handleLogout} />
+        <OfferProducts />
+        <Footer />
+      </>
+    </ProtectedRoute>
+  }
+/>
 
-      {/* 🔴 CHANGED: Cart sidebar mounted globally */}
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+
+      </Routes>
     </>
   );
 };

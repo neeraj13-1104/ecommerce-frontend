@@ -38,7 +38,7 @@ const HomeCarousel = ({ selectedCategory }) => {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="relative w-full h-[180px] sm:h-[250px] md:h-[320px] lg:h-[400px] xl:h-[450px] rounded-md">
+      <div className=" w-full h-[180px] sm:h-[250px] md:h-[320px] lg:h-[400px] xl:h-[450px] rounded-md">
         {carousel.map((item, i) => (
           <div
             key={item._id}
@@ -49,7 +49,7 @@ const HomeCarousel = ({ selectedCategory }) => {
             <img
               src={`http://localhost:5000/${item.image}`}
               alt={item.title}
-              className="w-full h-full object-cover rounded-md"
+              className="w-full h-full object-cover "
             />
             <div className="absolute inset-0 bg-black/30 z-20 rounded-md" />
             <div className="absolute inset-0 z-30 flex items-center px-6 md:px-12">

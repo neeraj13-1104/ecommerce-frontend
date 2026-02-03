@@ -1,195 +1,264 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaTimes, FaPlus, FaMinus } from "react-icons/fa";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
-const Cart = ({ isOpen, onClose }) => {
+const BASE_URL = "http://localhost:5000";
+
+const CartPage = () => {
   const [cart, setCart] = useState({ items: [] });
-  const [loading, setLoading] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [selectedOffers, setSelectedOffers] = useState({});
   const token = localStorage.getItem("token");
 
-  // 🔹 Fetch cart
+  // 🔹 Fetch Cart
   const fetchCart = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cart", {
+      const res = await axios.get(`${BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCart(res.data.cart || { items: [] });
     } catch (err) {
-      console.error("Failed to fetch cart:", err);
-      setCart({ items: [] });
+      console.error(err);
+    }
+  };
+
+  // 🔹 Fetch Active Offers
+  const fetchOffers = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/offers/active`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOffers(res.data.offers || []);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   useEffect(() => {
-    if (isOpen) fetchCart();
-  }, [isOpen]);
+    fetchCart();
+    fetchOffers();
+  }, []);
 
-  // 🔹 Update quantity
-  const updateQuantity = async (productId, quantity) => {
-    if (quantity < 1) return;
+  // 🔹 Change Quantity
+  const changeQty = async (productId, newQty) => {
     try {
+      if (newQty < 1) {
+        await axios.delete(`${BASE_URL}/api/cart/remove`, {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { productId },
+        });
+        fetchCart();
+        return;
+      }
+
       await axios.put(
-        "http://localhost:5000/api/cart/update",
-        { productId, quantity },
+        `${BASE_URL}/api/cart/update`,
+        { productId, quantity: newQty },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchCart();
+
+      setCart((prev) => ({
+        ...prev,
+        items: prev.items.map((item) =>
+          item.product._id === productId
+            ? { ...item, quantity: newQty }
+            : item
+        ),
+      }));
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to update quantity");
     }
   };
 
-  // 🔹 Remove from cart
-  const removeFromCart = async (productId) => {
-    try {
-      await axios.delete("http://localhost:5000/api/cart/remove", {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { productId },
-      });
-      fetchCart();
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to remove product");
+  // 🔹 Apply Offer (per product)
+  const applyOffer = async (offerId, productId) => {
+    if (!offerId) {
+      alert("Pehle offer select kar bhai 😅");
+      return;
     }
-  };
 
-  // 🔹 Place Order
-  const placeOrder = async () => {
-    if (cart.items.length === 0) return alert("Cart is empty");
     try {
-      setLoading(true);
-      const items = cart.items
-        .filter((item) => item.product)
-        .map((item) => ({
-          productId: item.product._id,
-          quantity: item.quantity,
-        }));
-
-      if (items.length === 0) return alert("No valid products in cart");
-
       await axios.post(
-        "http://localhost:5000/api/orders",
-        { items },
+        `${BASE_URL}/api/cart/apply-offer`,
+        { offerId, productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("✅ Order placed successfully");
-      onClose();
+      fetchCart();
     } catch (err) {
-      console.error(err);
-      alert("❌ Order failed");
-    } finally {
-      setLoading(false);
+      alert(err.response?.data?.message || "Offer not applicable ❌");
     }
   };
 
-  // 🔹 Total price
-  const totalPrice = cart.items.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+  // 🔹 Eligible offers by category
+  const getEligibleOffers = (category) => {
+    return offers.filter((offer) =>
+      offer.categories.includes(category)
+    );
+  };
+
+  // 🔹 Price Calculations
+  const totalMRP = cart.items.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   );
 
+  const totalDiscount = cart.items.reduce(
+    (sum, item) => sum + (item.discountAmount || 0),
+    0
+  );
+
+  const payableAmount = totalMRP - totalDiscount;
+
+  // 🔹 Place Order
+  const placeOrder = async () => {
+    try {
+      await axios.post(
+        `${BASE_URL}/api/orders/place`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("Order placed successfully ✅");
+      fetchCart();
+    } catch (err) {
+      alert(err.response?.data?.message || "Order failed ❌");
+    }
+  };
+
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-40 transition-opacity ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={onClose}
-      />
+    <div className="max-w-3xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">My Cart</h1>
 
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-xl transform transition-transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } flex flex-col`}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-2xl font-bold">Your Cart</h2>
-          <button onClick={onClose} className="text-gray-600 hover:text-gray-800">
-            <FaTimes size={20} />
-          </button>
-        </div>
+      {cart.items.length === 0 ? (
+        <p>Your cart is empty</p>
+      ) : (
+        <>
+          {/* 🔹 CART ITEMS */}
+          <div className="space-y-4">
+            {cart.items.map((item) => {
+              const product = item.product;
+              if (!product) return null;
 
-        {/* Items List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {cart.items.length === 0 ? (
-            <p className="text-gray-500 text-center mt-10">Your cart is empty</p>
-          ) : (
-            cart.items.map((item) =>
-              item.product ? (
-                <div key={item.product._id} className="flex items-center gap-4 border rounded-lg p-3 shadow-sm">
-                  <img
-                    src={
-                      item.product.thumbnail?.startsWith("http")
-                        ? item.product.thumbnail
-                        : `http://localhost:5000${item.product.thumbnail}`
-                    }
-                    alt={item.product.title}
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <div className="flex-1 flex flex-col justify-between">
-                    <h3 className="font-semibold text-lg">{item.product.title}</h3>
-                    <p className="text-purple-600 font-bold">₹ {item.product.price}</p>
+              const eligibleOffers = getEligibleOffers(product.category);
 
-                    <div className="flex items-center gap-2 mt-2">
+              return (
+                <div
+                  key={product._id}
+                  className="border p-3 rounded space-y-2"
+                >
+                  <div className="flex gap-4 items-center">
+                    <img
+                      src={`${BASE_URL}${product.thumbnail}`}
+                      alt={product.title}
+                      className="w-24 h-24 object-cover rounded"
+                    />
+
+                    <div className="flex-1">
+                      <h2 className="font-semibold">{product.title}</h2>
+                      <p>₹ {product.price}</p>
+
+                      {item.discountAmount > 0 && (
+                        <p className="text-green-600 text-sm">
+                          Discount: ₹ {item.discountAmount}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
                       <button
-                        onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
-                        className="p-1 bg-gray-200 rounded hover:bg-gray-300"
+                        onClick={() =>
+                          changeQty(product._id, item.quantity - 1)
+                        }
+                        className="p-2 bg-gray-200 rounded"
                       >
                         <FaMinus />
                       </button>
-                      <span className="w-8 text-center">{item.quantity}</span>
+
+                      <span>{item.quantity}</span>
+
                       <button
-                        onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
-                        className="p-1 bg-gray-200 rounded hover:bg-gray-300"
+                        onClick={() =>
+                          changeQty(product._id, item.quantity + 1)
+                        }
+                        className="p-2 bg-gray-200 rounded"
                       >
                         <FaPlus />
                       </button>
-                      <button
-                        onClick={() => removeFromCart(item.product._id)}
-                        className="ml-auto text-red-600 hover:text-red-800 font-semibold"
-                      >
-                        Remove
-                      </button>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div key={item._id || Math.random()} className="border rounded-lg p-3 shadow text-red-500">
-                  Product not available
-                  <button
-                    onClick={() => removeFromCart(item._id)}
-                    className="ml-4 bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )
-            )
-          )}
-        </div>
 
-        {/* Summary */}
-        <div className="border-t p-4">
-          <p className="font-semibold mb-2">
-            Total Items: {cart.items.filter((item) => item.product).length}
-          </p>
-          <p className="text-xl font-bold mb-4">Total: ₹ {totalPrice}</p>
-          <button
-            onClick={placeOrder}
-            disabled={loading || cart.items.filter((item) => item.product).length === 0}
-            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 disabled:opacity-50"
-          >
-            {loading ? "Placing Order..." : "Place Order"}
-          </button>
-        </div>
-      </div>
-    </>
+                  {/* 🔹 OFFER SECTION */}
+                  {eligibleOffers.length > 0 ? (
+                    <div className="flex gap-2 items-center">
+                      <select
+                        className="border px-3 py-2 rounded"
+                        value={selectedOffers[product._id] || ""}
+                        onChange={(e) =>
+                          setSelectedOffers({
+                            ...selectedOffers,
+                            [product._id]: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">Select Offer</option>
+                        {eligibleOffers.map((offer) => (
+                          <option key={offer._id} value={offer._id}>
+                            {offer.title}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        className="bg-green-600 text-white px-4 py-2 rounded"
+                        onClick={() =>
+                          applyOffer(
+                            selectedOffers[product._id],
+                            product._id
+                          )
+                        }
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      No offers available
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 🔹 PRICE SUMMARY */}
+          <div className="border-t mt-6 pt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Total MRP</span>
+              <span>₹ {totalMRP}</span>
+            </div>
+
+            <div className="flex justify-between text-green-600">
+              <span>Total Discount</span>
+              <span>- ₹ {totalDiscount}</span>
+            </div>
+
+            <div className="flex justify-between font-semibold text-lg">
+              <span>Payable Amount</span>
+              <span>₹ {payableAmount}</span>
+            </div>
+
+            <button
+              onClick={placeOrder}
+              className="w-full mt-4 bg-black text-white py-3 rounded text-lg"
+            >
+              Place Order
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
-export default Cart;
+export default CartPage;

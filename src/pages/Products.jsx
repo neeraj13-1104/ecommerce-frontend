@@ -81,7 +81,7 @@ const Products = ({ selectedCategory }) => {
         { productId: id, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Added to cart");
+      // alert("✅ Added to cart");
     } catch (err) {
       console.error("Add to cart error", err);
     }

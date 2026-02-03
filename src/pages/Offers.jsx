@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTag } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Offers = ({ isCarouselView = false }) => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   /* ================= FETCH ACTIVE CATEGORY OFFERS ================= */
   const fetchOffers = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/offers/category/active"
+        "http://localhost:5000/api/offers/active"
       );
       setOffers(res.data?.offers || []);
     } catch (err) {
@@ -37,8 +39,8 @@ const Offers = ({ isCarouselView = false }) => {
     : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6";
 
   const cardClass = isCarouselView
-    ? "min-w-[220px] bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition flex-shrink-0 snap-start"
-    : "bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition";
+    ? "min-w-[220px] bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition flex-shrink-0 snap-start cursor-pointer"
+    : "bg-white shadow rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer";
 
   return (
     <div className={isCarouselView ? "" : "bg-gray-100 min-h-screen p-6"}>
@@ -65,7 +67,11 @@ const Offers = ({ isCarouselView = false }) => {
       {/* OFFER CARDS */}
       <div className={containerClass}>
         {offers.map((offer) => (
-          <div key={offer._id} className={cardClass}>
+          <div
+            key={offer._id}
+            className={cardClass}
+            onClick={() => navigate(`/offer/${offer._id}`)} // 🔥 ONLY ADDITION
+          >
             {/* BANNER IMAGE */}
             <div className="relative">
               <img
@@ -81,7 +87,9 @@ const Offers = ({ isCarouselView = false }) => {
 
             {/* OFFER DETAILS */}
             <div className="p-4">
-              <h2 className="font-semibold text-lg mb-2 truncate">{offer.title}</h2>
+              <h2 className="font-semibold text-lg mb-2 truncate">
+                {offer.title}
+              </h2>
 
               {/* MULTIPLE CATEGORIES */}
               <p className="text-gray-600 text-sm mb-1">Categories:</p>
@@ -97,7 +105,9 @@ const Offers = ({ isCarouselView = false }) => {
               </div>
 
               {offer.minCartValue > 0 && (
-                <p className="text-gray-600 text-sm mt-2">Min Cart: ₹{offer.minCartValue}</p>
+                <p className="text-gray-600 text-sm mt-2">
+                  Min Cart: ₹{offer.minCartValue}
+                </p>
               )}
 
               <div className="mt-2 text-xs text-gray-500">
