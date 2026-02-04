@@ -2,6 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { signInWithPopup } from "firebase/auth";
+import {auth , provider} from "../utils/firebase"
+import google from "../assets/google.jpg";
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Auth = ({ onLogin }) => {
@@ -35,6 +38,36 @@ const Auth = ({ onLogin }) => {
       alert(err.response?.data?.message || "Something went wrong");
     }
   };
+
+
+  const googleSignup = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+
+    const user = result.user;
+
+    const name = user.displayName;
+    const email = user.email;
+    // const photo = user.photoURL;
+
+    console.log(name, email);
+
+    // 🔥 Backend ko bhejo (JWT banane ke liye)
+    const res = await axios.post(`${BASE_URL}/api/auth/google-login`, {
+      name,
+      email,
+      // photo,
+    });
+
+    localStorage.setItem("token", res.data.token);
+    onLogin();
+    navigate("/header");
+
+  } catch (error) {
+    console.error(error);
+    alert("Google login failed");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500">
@@ -86,6 +119,19 @@ const Auth = ({ onLogin }) => {
         <button className="w-full bg-purple-600 text-white py-2 rounded mb-3">
           {isLogin ? "Login" : "Sign Up"}
         </button>
+        {/* GOOGLE LOGIN BUTTON */}
+<button
+  type="button"
+  onClick={googleSignup}
+  className="w-full border border-gray-300 py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-100 mb-3"
+>
+  <img
+    src={google}
+    className="w-5 h-5"
+  />
+  Continue with Google
+</button>
+
 
         <p className="text-center text-sm">
           {isLogin ? "New user?" : "Already have an account?"}{" "}
