@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const HomeCarousel = ({ selectedCategory }) => {
   const [carousel, setCarousel] = useState([]);
@@ -9,7 +10,7 @@ const HomeCarousel = ({ selectedCategory }) => {
   const fetchCarousel = async () => {
     try {
       const query = selectedCategory !== "all" ? `?category=${selectedCategory}` : "";
-      const res = await axios.get(`http://localhost:5000/api/carousel${query}`);
+      const res = await axios.get(`${BASE_URL}/api/carousel${query}`);
       setCarousel(res.data || []);
       setLoading(false);
     } catch (err) {
@@ -47,7 +48,7 @@ const HomeCarousel = ({ selectedCategory }) => {
             }`}
           >
             <img
-              src={`http://localhost:5000/${item.image}`}
+              src={`${BASE_URL}/${item.image}`}
               alt={item.title}
               className="w-full h-full object-cover "
             />

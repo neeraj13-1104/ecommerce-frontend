@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const OfferProducts = () => {
   const { offerId } = useParams();
@@ -12,13 +13,13 @@ const OfferProducts = () => {
   const getImageUrl = (path) => {
     if (!path) return "/placeholder.png";
     if (path.startsWith("http")) return path;
-    return `http://localhost:5000${path}`;
+    return `${BASE_URL}${path}`;
   };
 
   const fetchOfferProducts = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/offers/category-offer/${offerId}/products`
+        `${BASE_URL}/api/offers/category-offer/${offerId}/products`
       );
       setProducts(res.data.products || []);
     } catch (err) {

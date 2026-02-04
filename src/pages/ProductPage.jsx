@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -15,7 +16,7 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/products/detail/${id}`
+          `${BASE_URL}/api/products/detail/${id}`
         );
         if (res.data.success) {
           setProduct(res.data.data);
@@ -36,7 +37,7 @@ const ProductPage = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/cart/add",
+        "${BASE_URL}/api/cart/add",
         { productId: product._id, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -67,7 +68,7 @@ const ProductPage = () => {
 
   // 🔹 Helper for absolute URL
   const getImageUrl = (img) =>
-    img.startsWith("http") ? img : `http://localhost:5000${img}`;
+    img.startsWith("http") ? img : `${BASE_URL}${img}`;
 
   return (
     <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-10">

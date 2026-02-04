@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import React from "react";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -14,7 +15,7 @@ const ResetPassword = () => {
     e.preventDefault();
     try {
       await axios.post(
-        `http://localhost:5000/api/auth/reset-password/${token}`,
+        `${BASE_URL}/api/auth/reset-password/${token}`,
         { password, confirmPassword }
       );
       alert("Password reset successful. Please login.");

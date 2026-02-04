@@ -9,6 +9,8 @@ import {
   FaBars,
 } from "react-icons/fa";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 
 const Header = ({ onLogout, onCartOpen }) => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const Header = ({ onLogout, onCartOpen }) => {
     if (!token) return;
 
     axios
-      .get("http://localhost:5000/api/wishlist/count", {
+      .get(`${BASE_URL}/api/wishlist/count`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setWishlistCount(res.data.count || 0))

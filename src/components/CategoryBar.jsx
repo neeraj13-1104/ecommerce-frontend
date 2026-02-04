@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 import {
   FaThLarge,
@@ -18,7 +19,7 @@ const CategoryBar = ({ selectedCategory, onSelectCategory }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products/categories")
+      .get(`${BASE_URL}/api/products/categories`)
       .then((res) => {
         setCategories(["all", ...res.data.data]);
       })

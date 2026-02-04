@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaHeart, FaShareAlt, FaTags } from "react-icons/fa";
 import Offers from "../pages/Offers";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Products = ({ selectedCategory }) => {
   const [products, setProducts] = useState([]);
@@ -23,14 +24,14 @@ const Products = ({ selectedCategory }) => {
   const getImageUrl = (path) => {
     if (!path) return "/placeholder.png";
     if (path.startsWith("http")) return path;
-    return `http://localhost:5000${path}`;
+    return `${BASE_URL}${path}`;
   };
 
   /* ================= FETCH PRODUCTS ================= */
   const fetchProducts = async (pageNumber = 1) => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/products/cart", {
+      const res = await axios.get(`${BASE_URL}/api/products/cart`, {
         params: {
           page: pageNumber,
           limit,
@@ -51,7 +52,7 @@ const Products = ({ selectedCategory }) => {
   const fetchWishlist = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:5000/api/wishlist", {
+      const res = await axios.get(`${BASE_URL}/api/wishlist`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWishlistIds(res.data.wishlist.map((p) => p._id));
@@ -77,7 +78,7 @@ const Products = ({ selectedCategory }) => {
     if (!token) return alert("Please login first");
     try {
       await axios.post(
-        "http://localhost:5000/api/cart/add",
+        `${BASE_URL}/api/cart/add`,
         { productId: id, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -94,13 +95,13 @@ const Products = ({ selectedCategory }) => {
     try {
       if (wishlistIds.includes(id)) {
         await axios.delete(
-          `http://localhost:5000/api/wishlist/remove/${id}`,
+          `${BASE_URL}/api/wishlist/remove/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setWishlistIds((prev) => prev.filter((x) => x !== id));
       } else {
         await axios.post(
-          "http://localhost:5000/api/wishlist/add",
+          `${BASE_URL}/api/wishlist/add`,
           { productId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );

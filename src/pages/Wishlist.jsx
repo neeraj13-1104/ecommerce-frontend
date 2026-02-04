@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTrash, FaShoppingCart } from "react-icons/fa";
 import React from "react";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Wishlist = () => {
   const [items, setItems] = useState([]);
@@ -13,7 +14,7 @@ const Wishlist = () => {
   const fetchWishlist = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/wishlist", {
+      const res = await axios.get(`${BASE_URL}/api/wishlist`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -30,7 +31,7 @@ const Wishlist = () => {
   const removeFromWishlist = async (productId) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/wishlist/remove/${productId}`,
+        `${BASE_URL}/api/wishlist/remove/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,7 +48,7 @@ const Wishlist = () => {
   const moveToCart = async (productId) => {
     try {
       await axios.post(
-        "http://localhost:5000/api/cart/add",
+        `${BASE_URL}/api/cart/add`,
         { productId },
         {
           headers: {
@@ -92,7 +93,7 @@ const Wishlist = () => {
               src={
                 item.thumbnail?.startsWith("http")
                   ? item.thumbnail
-                  : `http://localhost:5000${item.thumbnail}`
+                  : `${BASE_URL}${item.thumbnail}`
               }
               className="h-40 w-full object-cover rounded"
             />

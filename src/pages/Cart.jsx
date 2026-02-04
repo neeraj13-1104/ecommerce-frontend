@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
   const [cart, setCart] = useState({ items: [] });

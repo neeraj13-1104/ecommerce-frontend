@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Auth = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Auth = ({ onLogin }) => {
     try {
       if (isLogin) {
         // LOGIN
-        const res = await axios.post("http://localhost:5000/api/auth/login", {
+        const res = await axios.post(`${BASE_URL}/api/auth/login`, {
           email: form.email,
           password: form.password,
         });
@@ -25,7 +26,7 @@ const Auth = ({ onLogin }) => {
         navigate("/header"); // redirect after login
       } else {
         // SIGNUP
-        await axios.post("http://localhost:5000/api/auth/signup", form);
+        await axios.post(`${BASE_URL}/api/auth/signup`, form);
         alert("Signup successful! Please login");
         setIsLogin(true);
         setForm({ name: "", email: "", password: "" });

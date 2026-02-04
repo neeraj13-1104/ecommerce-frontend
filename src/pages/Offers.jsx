@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaTag } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Offers = ({ isCarouselView = false }) => {
   const [offers, setOffers] = useState([]);
@@ -12,7 +13,7 @@ const Offers = ({ isCarouselView = false }) => {
   const fetchOffers = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/offers/active"
+        `${BASE_URL}/api/offers/active`
       );
       setOffers(res.data?.offers || []);
     } catch (err) {
@@ -75,7 +76,7 @@ const Offers = ({ isCarouselView = false }) => {
             {/* BANNER IMAGE */}
             <div className="relative">
               <img
-                src={`http://localhost:5000${offer.bannerImage}`}
+                src={`${BASE_URL}${offer.bannerImage}`}
                 alt={offer.title}
                 className="h-40 w-full object-cover"
               />
