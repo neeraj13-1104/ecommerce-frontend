@@ -4,11 +4,8 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
-  authDomain: "storelogin-5daf5.firebaseapp.com",
-  projectId: "storelogin-5daf5",
-  storageBucket: "storelogin-5daf5.firebasestorage.app",
-  messagingSenderId: "139437552744",
-  appId: "1:139437552744:web:c5cded2a3ceb28ce98b7dd"
+  authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECTID,
 };
 
 const app = initializeApp(firebaseConfig);

@@ -42,32 +42,32 @@ const Auth = ({ onLogin }) => {
 
   const googleSignup = async () => {
   try {
+    // 1️⃣ Google popup
     const result = await signInWithPopup(auth, provider);
 
-    const user = result.user;
+    // 2️⃣ 🔥 Google ID TOKEN (MOST IMPORTANT)
+    const idToken = await result.user.getIdToken();
 
-    const name = user.displayName;
-    const email = user.email;
-    // const photo = user.photoURL;
+    // 3️⃣ Backend ko token bhejo
+    const res = await axios.post(
+      `http://localhost:5000/api/auth/google`,
+      { idToken }
+    );
 
-    console.log(name, email);
-
-    // 🔥 Backend ko bhejo (JWT banane ke liye)
-    const res = await axios.post(`${BASE_URL}/api/auth/google-login`, {
-      name,
-      email,
-      // photo,
-    });
-
+    // 4️⃣ JWT save
     localStorage.setItem("token", res.data.token);
+
     onLogin();
     navigate("/header");
 
   } catch (error) {
     console.error(error);
-    alert("Google login failed");
+    alert(
+      error.response?.data?.message || "Google login failed"
+    );
   }
 };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500">
