@@ -50,7 +50,7 @@ const Auth = ({ onLogin }) => {
 
     // 3️⃣ Backend ko token bhejo
     const res = await axios.post(
-      `http://localhost:5000/api/auth/google`,
+      `${BASE_URL}/api/auth/google`,
       { idToken }
     );
 
